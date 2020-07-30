@@ -53,6 +53,7 @@ import { Codicon } from 'vs/base/common/codicons';
 import { CodiconLabel } from 'vs/base/browser/ui/codicons/codiconLabel';
 import { IJSONSchema } from 'vs/base/common/jsonSchema';
 import { IList } from 'vs/base/browser/ui/tree/indexTreeModel';
+import { WorkbenchObjectTree } from 'vs/platform/list/browser/listService';
 
 const $ = DOM.$;
 
@@ -523,6 +524,7 @@ export abstract class AbstractSettingRenderer extends Disposable implements ITre
 	}
 
 	protected renderCommonTemplate(tree: any, _container: HTMLElement, typeClass: string): ISettingItemTemplate {
+		_container.tabIndex = -1;
 		DOM.addClass(_container, 'setting-item');
 		DOM.addClass(_container, 'setting-item-' + typeClass);
 
@@ -1432,6 +1434,7 @@ export class SettingBoolRenderer extends AbstractSettingRenderer implements ITre
 	templateId = SETTINGS_BOOL_TEMPLATE_ID;
 
 	renderTemplate(_container: HTMLElement): ISettingBoolItemTemplate {
+		_container.tabIndex = -1;
 		DOM.addClass(_container, 'setting-item');
 		DOM.addClass(_container, 'setting-item-bool');
 
@@ -1504,11 +1507,11 @@ export class SettingBoolRenderer extends AbstractSettingRenderer implements ITre
 		// Prevent clicks from being handled by list
 		toDispose.add(DOM.addDisposableListener(controlElement, 'mousedown', (e: IMouseEvent) => e.stopPropagation()));
 
-		toDispose.add(DOM.addStandardDisposableListener(controlElement, 'keydown', (e: StandardKeyboardEvent) => {
-			if (e.keyCode === KeyCode.Escape) {
-				e.browserEvent.stopPropagation();
-			}
-		}));
+		// toDispose.add(DOM.addStandardDisposableListener(controlElement, 'keydown', (e: StandardKeyboardEvent) => {
+		// 	if (e.keyCode === KeyCode.Escape) {
+		// 		e.browserEvent.stopPropagation();
+		// 	}
+		// }));
 
 		toDispose.add(DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_ENTER, e => container.classList.add('mouseover')));
 		toDispose.add(DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_LEAVE, e => container.classList.remove('mouseover')));
@@ -1888,6 +1891,7 @@ export class SettingsTree extends ObjectTree<SettingsTreeElement> {
 				styleController: id => new DefaultStyleController(DOM.createStyleSheet(container), id),
 				filter: instantiationService.createInstance(SettingsTreeFilter, viewState),
 				smoothScrolling: configurationService.getValue<boolean>('workbench.list.smoothScrolling'),
+				multipleSelectionSupport: false,
 			});
 
 		this.disposables.clear();
@@ -1944,21 +1948,21 @@ export class SettingsTree extends ObjectTree<SettingsTreeElement> {
 		this.getHTMLElement().classList.add('settings-editor-tree');
 
 		this.disposables.add(attachStyler(themeService, {
-			listBackground: editorBackground,
-			listActiveSelectionBackground: editorBackground,
-			listActiveSelectionForeground: foreground,
-			listFocusAndSelectionBackground: editorBackground,
-			listFocusAndSelectionForeground: foreground,
-			listFocusBackground: editorBackground,
-			listFocusForeground: foreground,
-			listHoverForeground: foreground,
-			listHoverBackground: editorBackground,
-			listHoverOutline: editorBackground,
-			listFocusOutline: editorBackground,
-			listInactiveSelectionBackground: editorBackground,
-			listInactiveSelectionForeground: foreground,
-			listInactiveFocusBackground: editorBackground,
-			listInactiveFocusOutline: editorBackground
+			// listBackground: editorBackground,
+			// listActiveSelectionBackground: editorBackground,
+			// listActiveSelectionForeground: foreground,
+			// listFocusAndSelectionBackground: editorBackground,
+			// listFocusAndSelectionForeground: foreground,
+			// listFocusBackground: editorBackground,
+			// listFocusForeground: foreground,
+			// listHoverForeground: foreground,
+			// listHoverBackground: editorBackground,
+			// listHoverOutline: editorBackground,
+			// listFocusOutline: editorBackground,
+			// listInactiveSelectionBackground: editorBackground,
+			// listInactiveSelectionForeground: foreground,
+			// listInactiveFocusBackground: editorBackground,
+			// listInactiveFocusOutline: editorBackground
 		}, colors => {
 			this.style(colors);
 		}));

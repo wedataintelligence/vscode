@@ -18,6 +18,12 @@ import { ISettingsEditorViewState, SearchResultModel, SettingsTreeElement, Setti
 import { settingsHeaderForeground } from 'vs/workbench/contrib/preferences/browser/settingsWidgets';
 import { localize } from 'vs/nls';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
+import { IListService, IWorkbenchObjectTreeOptions, WorkbenchObjectTree } from 'vs/platform/list/browser/listService';
+import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
+import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
+import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
+import { IAccessibilityService } from 'vs/platform/accessibility/common/accessibility';
+import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 
 const $ = DOM.$;
 
@@ -103,6 +109,10 @@ export class TOCRenderer implements ITreeRenderer<SettingsTreeGroupElement, neve
 	templateId = TOC_ENTRY_TEMPLATE_ID;
 
 	renderTemplate(container: HTMLElement): ITOCEntryTemplate {
+		const test = DOM.append(container, $('div'));
+		test.textContent = 'test: ';
+		test.tabIndex = 0;
+
 		return {
 			labelElement: DOM.append(container, $('.settings-toc-entry')),
 			countElement: DOM.append(container, $('.settings-toc-count'))
@@ -187,17 +197,22 @@ class SettingsAccessibilityProvider implements IListAccessibilityProvider<Settin
 	}
 }
 
-export class TOCTree extends ObjectTree<SettingsTreeGroupElement> {
+export class TOCTree extends WorkbenchObjectTree<SettingsTreeGroupElement> {
 	constructor(
 		container: HTMLElement,
 		viewState: ISettingsEditorViewState,
+		@IContextKeyService contextKeyService: IContextKeyService,
+		@IListService listService: IListService,
 		@IThemeService themeService: IThemeService,
-		@IInstantiationService instantiationService: IInstantiationService
+		@IConfigurationService configurationService: IConfigurationService,
+		@IKeybindingService keybindingService: IKeybindingService,
+		@IAccessibilityService accessibilityService: IAccessibilityService,
+		@IInstantiationService instantiationService: IInstantiationService,
 	) {
 		// test open mode
 
 		const filter = instantiationService.createInstance(SettingsTreeFilter, viewState);
-		const options: IObjectTreeOptions<SettingsTreeGroupElement> = {
+		const options: IWorkbenchObjectTreeOptions<SettingsTreeGroupElement, void> = {
 			filter,
 			multipleSelectionSupport: false,
 			identityProvider: {
@@ -210,10 +225,19 @@ export class TOCTree extends ObjectTree<SettingsTreeGroupElement> {
 			collapseByDefault: true
 		};
 
-		super('SettingsTOC', container,
+		super(
+			'SettingsTOC',
+			container,
 			new TOCTreeDelegate(),
 			[new TOCRenderer()],
-			options);
+			options,
+			contextKeyService,
+			listService,
+			themeService,
+			configurationService,
+			keybindingService,
+			accessibilityService,
+		);
 
 		this.disposables.add(attachStyler(themeService, {
 			listBackground: editorBackground,
